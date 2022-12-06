@@ -18,12 +18,14 @@ transform_test = transforms.Compose([
 test_dataset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_test)
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=100, shuffle=False, num_workers=4)
 
-net = ResNet18()
+# net = ResNet18()
+# net = net.to(device)
+# net = torch.nn.DataParallel(net)
+# cudnn.benchmark = True
+# checkpoint = torch.load('./checkpoint/' + file_name)
+# net.load_state_dict(checkpoint['net'])
+net = torch.jit.load('./models/modelscifar10_resnet20.pth')
 net = net.to(device)
-net = torch.nn.DataParallel(net)
-cudnn.benchmark = True
-checkpoint = torch.load('./checkpoint/' + file_name)
-net.load_state_dict(checkpoint['net'])
 
 adversary = LinfPGDAttack(net, loss_fn=nn.CrossEntropyLoss(), eps=0.0314, nb_iter=7, eps_iter=0.00784, rand_init=True, clip_min=0.0, clip_max=1.0, targeted=False)
 criterion = nn.CrossEntropyLoss()
